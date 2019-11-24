@@ -45,12 +45,12 @@
      FDT = 261,
      LEER = 262,
      ESCRIBIR = 263,
-     SUMA = 264,
-     RESTA = 265,
-     PARENIZQUIERDO = 266,
-     PARENDERECHO = 267,
-     COMA = 268,
-     PUNTOYCOMA = 269,
+     PARENIZQUIERDO = 264,
+     PARENDERECHO = 265,
+     COMA = 266,
+     PUNTOYCOMA = 267,
+     SUMA = 268,
+     RESTA = 269,
      CONSTANTE = 270,
      ASIGNACION = 271
    };
@@ -62,12 +62,12 @@
 #define FDT 261
 #define LEER 262
 #define ESCRIBIR 263
-#define SUMA 264
-#define RESTA 265
-#define PARENIZQUIERDO 266
-#define PARENDERECHO 267
-#define COMA 268
-#define PUNTOYCOMA 269
+#define PARENIZQUIERDO 264
+#define PARENDERECHO 265
+#define COMA 266
+#define PUNTOYCOMA 267
+#define SUMA 268
+#define RESTA 269
 #define CONSTANTE 270
 #define ASIGNACION 271
 
@@ -76,7 +76,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 20 "parser.y"
+#line 19 "parser.y"
 {
 	char string[100];
 	char character;

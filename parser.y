@@ -9,10 +9,9 @@ void fin(void);
 void asignar(const char *, const int);
 void leer_id(const char *);
 int valor_id(const char *);
-char *chequear(const char *);
 void escribir_exp(const int val);
 int operacionAditiva(const int, const char, const int);
-char *invertir(const char *);
+int negativo(const char operador, const int val);
 
 void yyerror(const char *s);
 %}
@@ -25,18 +24,9 @@ void yyerror(const char *s);
 
 %define "parser.tab.h"
 %output = "parser.tab.c"
-%token <string> ID
-%token INICIO
-%token FIN
-%token FDT
-%token LEER
-%token ESCRIBIR
+%token <string> ID INICIO FIN FDT LEER ESCRIBIR PARENIZQUIERDO PARENDERECHO COMA PUNTOYCOMA
 %token <character> SUMA
 %token <character> RESTA
-%token PARENIZQUIERDO
-%token PARENDERECHO
-%token COMA
-%token PUNTOYCOMA
 %token <integer> CONSTANTE
 %right ASIGNACION
 %left RESTA SUMA
@@ -69,6 +59,7 @@ listaExpresiones	: expresion {escribir_exp($1);}
 			;
 
 expresion	: primaria
+			| operadorAditivo primaria { $$ = negativo($1,$2);}
 			| expresion operadorAditivo primaria { printf("operador: %c\n",$2);$$ = operacionAditiva($1,$2,$3);}
 			;
 
@@ -83,7 +74,7 @@ operadorAditivo : SUMA
 
 %%
 
-struct ids_dinamicos {
+struct id {
 	char **id_nombres;
 	int *ids;
 	int id_nombres_size;
@@ -132,6 +123,13 @@ int operacionAditiva(const int val1, const char operadorAditivo, const int val2)
 			return val1 - val2;
 	}
 	return 0;
+}
+
+int negativo(const char operador, const int val){
+	if (operador == '-'){
+			return -val;
+	}
+	return val;
 }
 
 void leer_id(const char *id) {

@@ -22,7 +22,7 @@ err_cons [0-9][a-zA-Z0-9]+
 "escribir"							{ return ESCRIBIR; }
 "fdt"								{ return FDT; }
 {letra}({letra}|{digito}){0,31}		{ strcpy(yylval.string,yytext); return ID; }
--?{digito}+							{ yylval.integer = atoi(yytext); return CONSTANTE; }
+{digito}+							{ yylval.integer = atoi(yytext); return CONSTANTE; }
 ":="								{ return ASIGNACION; }
 -									{ yylval.character = '-'; return RESTA; }
 \+									{ yylval.character = '+'; return SUMA; }

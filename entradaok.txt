@@ -7,6 +7,12 @@ inicio
 	A2 := 1+5-3;
 	leer (A2);
 fin
+fdt
+
+inicio
+	A2 := -3-4;
+fin
+fdt
 
 inicio A1 := --1; a2 := A1 + 2; leer(a2); fin
 
