@@ -1,0 +1,6 @@
+inicio
+	A1 := 5;
+	A2 := 3;
+	A1 := A2;
+fin
+fdt

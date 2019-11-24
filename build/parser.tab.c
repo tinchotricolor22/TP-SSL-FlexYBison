@@ -106,7 +106,8 @@
 
 #include <stdio.h>
 #include "scanner.yy.h"
-#define YYERROR_VERBOSE
+#include <dirent.h>
+#define YYERROR_VERBOSE //para mostrar más descripcion en los errores
 void yyerror(const char *);
 
 void inicio(void);
@@ -118,7 +119,10 @@ void escribir_exp(const int val);
 int operacionAditiva(const int, const char, const int);
 int negativo(const char operador, const int val);
 
-void yyerror(const char *s);
+//para ejecutar los tests y parsear archivos
+void ejecutar_tests();
+int parsear_archivo(const char* archivo);
+int ends_with(const char *str, const char *suffix);
 
 
 /* Enabling traces.  */
@@ -141,14 +145,14 @@ void yyerror(const char *s);
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 19 "parser.y"
+#line 23 "parser.y"
 {
 	char string[100];
 	char character;
 	int integer;
 }
 /* Line 193 of yacc.c.  */
-#line 152 "parser.tab.c"
+#line 156 "parser.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -161,7 +165,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 165 "parser.tab.c"
+#line 169 "parser.tab.c"
 
 #ifdef short
 # undef short
@@ -452,9 +456,9 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    39,    39,    39,    41,    44,    45,    48,    49,    50,
-      53,    54,    57,    58,    61,    62,    63,    66,    67,    68,
-      71,    72
+       0,    43,    43,    43,    45,    48,    49,    52,    53,    54,
+      57,    58,    61,    62,    65,    66,    67,    70,    71,    72,
+      75,    76
 };
 #endif
 
@@ -1381,63 +1385,63 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 39 "parser.y"
+#line 43 "parser.y"
     { inicio(); ;}
     break;
 
   case 3:
-#line 39 "parser.y"
+#line 43 "parser.y"
     { fin();;}
     break;
 
   case 7:
-#line 48 "parser.y"
-    { printf("$1=%s,$3=%d\n",(yyvsp[(1) - (4)].string),(yyvsp[(3) - (4)].integer));asignar((yyvsp[(1) - (4)].string),(yyvsp[(3) - (4)].integer));;}
+#line 52 "parser.y"
+    { asignar((yyvsp[(1) - (4)].string),(yyvsp[(3) - (4)].integer));;}
     break;
 
   case 10:
-#line 53 "parser.y"
+#line 57 "parser.y"
     {leer_id((yyvsp[(1) - (1)].string));;}
     break;
 
   case 11:
-#line 54 "parser.y"
+#line 58 "parser.y"
     {leer_id((yyvsp[(3) - (3)].string));;}
     break;
 
   case 12:
-#line 57 "parser.y"
+#line 61 "parser.y"
     {escribir_exp((yyvsp[(1) - (1)].integer));;}
     break;
 
   case 13:
-#line 58 "parser.y"
+#line 62 "parser.y"
     {escribir_exp((yyvsp[(3) - (3)].integer));;}
     break;
 
   case 15:
-#line 62 "parser.y"
+#line 66 "parser.y"
     { (yyval.integer) = negativo((yyvsp[(1) - (2)].character),(yyvsp[(2) - (2)].integer));;}
     break;
 
   case 16:
-#line 63 "parser.y"
-    { printf("operador: %c\n",(yyvsp[(2) - (3)].character));(yyval.integer) = operacionAditiva((yyvsp[(1) - (3)].integer),(yyvsp[(2) - (3)].character),(yyvsp[(3) - (3)].integer));;}
+#line 67 "parser.y"
+    { (yyval.integer) = operacionAditiva((yyvsp[(1) - (3)].integer),(yyvsp[(2) - (3)].character),(yyvsp[(3) - (3)].integer));;}
     break;
 
   case 17:
-#line 66 "parser.y"
+#line 70 "parser.y"
     {(yyval.integer) = valor_id((yyvsp[(1) - (1)].string));}
     break;
 
   case 19:
-#line 68 "parser.y"
+#line 72 "parser.y"
     { (yyval.integer) = (yyvsp[(2) - (3)].integer);;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1441 "parser.tab.c"
+#line 1445 "parser.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1651,7 +1655,7 @@ yyreturn:
 }
 
 
-#line 75 "parser.y"
+#line 79 "parser.y"
 
 
 struct id {
@@ -1719,11 +1723,8 @@ void leer_id(const char *id) {
 int valor_id(const char *id){
 	if(ids.ids_size > 0){
 		for(int i = 0;i <ids.ids_size; i++){
-			printf("nombre == ID?: %s,%s\n", ids.id_nombres[i],id);
-
 			if (!strcmp(id,ids.id_nombres[i])){
-				printf("Son iguales. Valor a mostrar:%d\n",ids.ids[i]);
-				return ids.ids[i];
+ 				return ids.ids[i];
 			}
 		}
 	}
@@ -1753,19 +1754,103 @@ void asignar(const char *id, const int valor) {
 }
 
 void inicio(void) {
-	printf("COMPILADOR CON FLEX Y BISON. Ingrese la secuencia de sentencias a evaluar:\n");
-	ids.ids_size = 0;
+	printf("Comienza a compilar:\n");
 }
 
 void fin(void) {
 	printf("Compilación terminada.\n");
 }
 
-int main(void) {
-	yyparse();
-}
-
 void yyerror(const char *s){
 	printf("línea #%d - %s\n", yylineno, s);
 	return;
+}
+
+
+/*Se ejecutan los casos de prueba que estan dentro de la carpeta "casos"
+  Tener en cuenta que si bien se probo la asignación correcta y guardado en memoria,
+  solo se evalua si se parsea bien o mal, dependiendo lo que pida el test.
+
+  Para pasar un test:
+  Si termina con "OK.test", esperamos que se parsee bien (yyparse() == 0)
+  Si termina con "OtraCosa.test", esperamos que se parsee mal (yyparse() != 0)
+*/
+void ejecutar_tests() {
+	printf("Ejecutando tests...");
+	int testPass = 0;
+	int testFail = 0;
+	DIR *d;
+    struct dirent *dir;
+    d = opendir("casos");
+    if (d)
+    {
+        while ((dir = readdir(d)) != NULL)
+        {
+        	if(ends_with(dir->d_name,".test")){
+        		int mustPass = ends_with(dir->d_name,"OK.test"); //el result del parse debe dar 0 
+
+        		char buf[300];
+        		strcpy(buf,"casos/");
+        		strcat(buf,dir->d_name);
+        		int result = parsear_archivo(buf);
+        		if (mustPass){
+        			if (result == 0){
+        				testPass++;	
+        			}else{
+        				testFail++;
+        			}
+        		}else{
+        			if (result == 0){
+        				testFail++;	
+        			}else{
+        				testPass++;
+        			}
+        		}
+        	}
+        }
+        closedir(d);
+    }
+	printf("TOTAL DE TESTS CORRIDOS: %d\n", testPass + testFail);
+	printf("Test que pasaron: %d\n", testPass);
+	printf("Test que fallaron: %d\n", testFail);
+}
+
+int ends_with(const char *str, const char *suffix)
+{
+    if (!str || !suffix)
+        return 0;
+    size_t lenstr = strlen(str);
+    size_t lensuffix = strlen(suffix);
+    if (lensuffix >  lenstr)
+        return 0;
+    return strncmp(str + lenstr - lensuffix, suffix, lensuffix) == 0;
+}
+
+int parsear_archivo(const char* archivo){
+	printf("Interpretando el archivo %s\n", archivo);	
+	yyin = fopen(archivo, "r");
+	int result = yyparse();
+	yyrestart(yyin);
+	return result;
+}
+
+int main(int argc, char **argv) {
+	ids.ids_size = 0;
+	ids.id_nombres_size = 0;
+
+	if(argc > 1){
+		//se agrega la posibilidad de correr tests con el argumento
+		if (!strcmp(argv[1],"-correr_tests")){
+			ejecutar_tests();
+		} else {
+			/*en caso de que no este el argumento de correr_tests y haya varios argumentos,
+			asumimos que son archivos que tenemos que parsear */
+			for(int i = 1; i < argc ; i++){
+				parsear_archivo(argv[i]);
+			}
+		}
+	} else {
+		//caso contrario, vamos por la consola
+		yyparse(); // yyin = stdin
+	}
 }

@@ -1,0 +1,10 @@
+inicio
+	A1 := 10 + (-5);
+	A2 := 2;
+	A3 := (3 + 5) + A2 - A1;
+	escribir((3 + 5) + A2 - A1);
+	leer(A1,A2,A3);
+	A1 := A2;
+	escribir(A1 - A2, 2 - 2);
+fin
+fdt

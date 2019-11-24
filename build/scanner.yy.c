@@ -375,8 +375,8 @@ static yyconst flex_int16_t yy_accept[77] =
         0,    0,   20,   18,   17,   11,   12,   10,   13,    9,
         7,   18,   14,    6,    6,    6,    6,    6,   17,    7,
        16,    8,   15,    6,    6,    6,    6,    6,    6,   15,
-        6,    6,    5,    2,    6,    6,    6,    6,    6,    3,
-        6,    6,    6,    6,    6,    1,    6,    6,    6,    4,
+        6,    6,    3,    2,    6,    6,    6,    6,    6,    4,
+        6,    6,    6,    6,    6,    1,    6,    6,    6,    5,
         6,    6,    6,    6,    6,    6,    6,    6,    6,    6,
         6,    6,    6,    6,    6,    6,    6,    6,    6,    6,
         6,    6,    6,    6,    0,    0
@@ -711,7 +711,7 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 18 "scanner.l"
+#line 17 "scanner.l"
 
 #line 717 "scanner.yy.c"
 
@@ -798,94 +798,94 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 19 "scanner.l"
+#line 18 "scanner.l"
 { return INICIO; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 20 "scanner.l"
+#line 19 "scanner.l"
 { return FIN; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
+#line 20 "scanner.l"
+{ return FDT; }
+	YY_BREAK
+case 4:
+YY_RULE_SETUP
 #line 21 "scanner.l"
 { return LEER; }
 	YY_BREAK
-case 4:
+case 5:
 YY_RULE_SETUP
 #line 22 "scanner.l"
 { return ESCRIBIR; }
 	YY_BREAK
-case 5:
-YY_RULE_SETUP
-#line 23 "scanner.l"
-{ return FDT; }
-	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 24 "scanner.l"
+#line 23 "scanner.l"
 { strcpy(yylval.string,yytext); return ID; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 25 "scanner.l"
+#line 24 "scanner.l"
 { yylval.integer = atoi(yytext); return CONSTANTE; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 26 "scanner.l"
+#line 25 "scanner.l"
 { return ASIGNACION; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 27 "scanner.l"
+#line 26 "scanner.l"
 { yylval.character = '-'; return RESTA; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 28 "scanner.l"
+#line 27 "scanner.l"
 { yylval.character = '+'; return SUMA; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 29 "scanner.l"
+#line 28 "scanner.l"
 { return PARENIZQUIERDO; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 30 "scanner.l"
+#line 29 "scanner.l"
 { return PARENDERECHO; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 31 "scanner.l"
+#line 30 "scanner.l"
 { return COMA; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 32 "scanner.l"
+#line 31 "scanner.l"
 { return PUNTOYCOMA; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 33 "scanner.l"
-{ yyerror("ID incorrecto inválido"); }
+#line 32 "scanner.l"
+{ yyerror("ID incorrecto"); }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 34 "scanner.l"
+#line 33 "scanner.l"
 { yyerror("Constante inválida"); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 35 "scanner.l"
+#line 34 "scanner.l"
 { yyerror("Cadena inválida"); }
 	YY_BREAK
 case 18:
 /* rule 18 can match eol */
-#line 37 "scanner.l"
+#line 36 "scanner.l"
 case 19:
-#line 37 "scanner.l"
+#line 36 "scanner.l"
 ECHO;
 	YY_BREAK
 #line 892 "scanner.yy.c"
@@ -1885,6 +1885,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 37 "scanner.l"
+#line 36 "scanner.l"
 
 

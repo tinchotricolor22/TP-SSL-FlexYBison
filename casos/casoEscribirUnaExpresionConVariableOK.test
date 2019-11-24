@@ -1,0 +1,5 @@
+inicio
+	y32 := 32;
+	escribir(1 + 2, (y32-30));
+fin
+fdt

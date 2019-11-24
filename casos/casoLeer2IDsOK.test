@@ -1,0 +1,6 @@
+inicio
+	A1 := 5;
+	A324 := A1 + 3;
+	leer (A1,A324);
+fin
+fdt

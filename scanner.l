@@ -8,7 +8,6 @@ inline int yywrap(void) { return 1; };
 %}
 %option header-file="scanner.yy.h"
 %option outfile="scanner.yy.c"
-%pointer
 
 digito [0-9]
 letra [a-zA-Z]
@@ -18,9 +17,9 @@ err_cons [0-9][a-zA-Z0-9]+
 %%
 "inicio"							{ return INICIO; }
 "fin"								{ return FIN; }
+"fdt"								{ return FDT; }
 "leer"								{ return LEER; }
 "escribir"							{ return ESCRIBIR; }
-"fdt"								{ return FDT; }
 {letra}({letra}|{digito}){0,31}		{ strcpy(yylval.string,yytext); return ID; }
 {digito}+							{ yylval.integer = atoi(yytext); return CONSTANTE; }
 ":="								{ return ASIGNACION; }
@@ -30,7 +29,7 @@ err_cons [0-9][a-zA-Z0-9]+
 \)									{ return PARENDERECHO; }
 ,									{ return COMA; }
 ;									{ return PUNTOYCOMA; }
-{err_id}							{ yyerror("ID incorrecto inválido"); }
+{err_id}							{ yyerror("ID incorrecto"); }
 {err_cons}							{ yyerror("Constante inválida"); }
 {err_cad}							{ yyerror("Cadena inválida"); }
 .|\n								|

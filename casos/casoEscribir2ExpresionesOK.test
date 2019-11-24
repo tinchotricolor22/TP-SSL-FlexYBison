@@ -1,0 +1,4 @@
+inicio
+	escribir(1 + 2, (32-30));
+fin
+fdt
