@@ -1,6 +1,17 @@
-inicio
- A := BB + 34 * -C  ; //comentario 
- Z := (x + Y ) /W	;
- leer (A, B);
- escribir (2-Y);
-fin 
+inicio 
+	A1 := 35;
+	A2 := 30;
+	leer (A2,A1); 
+	A2 := A1;
+	leer (A2,A1);
+	A2 := 1+5-3;
+	leer (A2);
+fin
+
+inicio A1 := --1; a2 := A1 + 2; leer(a2); fin
+
+inicio A12 := 1+2-1+30-5-5+; fin
+
+inicio escribir (1+5-10,32+3,3,A12); fin
+
+{$$ = valor_id($1);}

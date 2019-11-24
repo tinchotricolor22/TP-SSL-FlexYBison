@@ -1,13 +1,14 @@
 %{
 #include <stdio.h>
+#include <stdlib.h>
 #include <strings.h>
-#include "parser.h"
+#include "parser.tab.h"
 
 inline int yywrap(void) { return 1; };
 %}
-%option header-file="scanner.h"
-%option outfile="scanner.c"
-%option yylineno
+%option header-file="scanner.yy.h"
+%option outfile="scanner.yy.c"
+%pointer
 
 digito [0-9]
 letra [a-zA-Z]
@@ -19,20 +20,18 @@ err_cons [0-9][a-zA-Z0-9]+
 "fin"								{ return FIN; }
 "leer"								{ return LEER; }
 "escribir"							{ return ESCRIBIR; }
-{letra}({letra}|{digito})+			{ yylval = strdup(yytext); return ID; }
-{digito}+							{ yylval = strdup(yytext);  return CONSTANTE; }
+"fdt"								{ return FDT; }
+{letra}({letra}|{digito}){0,31}		{ strcpy(yylval.string,yytext); return ID; }
+-?{digito}+							{ yylval.integer = atoi(yytext); return CONSTANTE; }
 ":="								{ return ASIGNACION; }
--									{ return '-'; }
-\+									{ return '+'; }
-\*									{ return '*'; }
-\/									{ return '/'; }
-\(									{ return '('; }
-\)									{ return ')'; }
-,									{ return ','; }
-;									{ return ';'; }
+-									{ yylval.character = '-'; return RESTA; }
+\+									{ yylval.character = '+'; return SUMA; }
+\(									{ return PARENIZQUIERDO; }
+\)									{ return PARENDERECHO; }
+,									{ return COMA; }
+;									{ return PUNTOYCOMA; }
 {err_id}							{ yyerror("ID incorrecto inválido"); }
 {err_cons}							{ yyerror("Constante inválida"); }
 {err_cad}							{ yyerror("Cadena inválida"); }
 .|\n								|
-"//".*								;
 %%

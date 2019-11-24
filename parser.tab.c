@@ -67,24 +67,36 @@
       know about them.  */
    enum yytokentype {
      ID = 258,
-     CONSTANTE = 259,
-     INICIO = 260,
-     FIN = 261,
+     INICIO = 259,
+     FIN = 260,
+     FDT = 261,
      LEER = 262,
      ESCRIBIR = 263,
-     NEG = 264,
-     ASIGNACION = 265
+     SUMA = 264,
+     RESTA = 265,
+     PARENIZQUIERDO = 266,
+     PARENDERECHO = 267,
+     COMA = 268,
+     PUNTOYCOMA = 269,
+     CONSTANTE = 270,
+     ASIGNACION = 271
    };
 #endif
 /* Tokens.  */
 #define ID 258
-#define CONSTANTE 259
-#define INICIO 260
-#define FIN 261
+#define INICIO 259
+#define FIN 260
+#define FDT 261
 #define LEER 262
 #define ESCRIBIR 263
-#define NEG 264
-#define ASIGNACION 265
+#define SUMA 264
+#define RESTA 265
+#define PARENIZQUIERDO 266
+#define PARENDERECHO 267
+#define COMA 268
+#define PUNTOYCOMA 269
+#define CONSTANTE 270
+#define ASIGNACION 271
 
 
 
@@ -93,18 +105,18 @@
 #line 1 "parser.y"
 
 #include <stdio.h>
-#include "scanner.h"
+#include "scanner.yy.h"
 #define YYERROR_VERBOSE
-#define YYSTYPE char*
 void yyerror(const char *);
 
-void comenzar(void);
-void terminar(void);
-void asignar(const char *, const char *);
+void inicio(void);
+void fin(void);
+void asignar(const char *, const int);
 void leer_id(const char *);
+int valor_id(const char *);
 char *chequear(const char *);
-void escribir_exp(const char *);
-char *gen_infijo(const char *, const char, const char *);
+void escribir_exp(const int val);
+int operacionAditiva(const int, const char, const int);
 char *invertir(const char *);
 
 void yyerror(const char *s);
@@ -129,7 +141,16 @@ void yyerror(const char *s);
 #endif
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+typedef union YYSTYPE
+#line 20 "parser.y"
+{
+	char string[100];
+	char character;
+	int integer;
+}
+/* Line 193 of yacc.c.  */
+#line 153 "parser.tab.c"
+	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1
@@ -141,7 +162,7 @@ typedef int YYSTYPE;
 
 
 /* Line 216 of yacc.c.  */
-#line 145 "parser.c"
+#line 166 "parser.tab.c"
 
 #ifdef short
 # undef short
@@ -356,20 +377,20 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  3
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   22
+#define YYLAST   36
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  19
+#define YYNTOKENS  17
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  7
+#define YYNNTS  11
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  11
+#define YYNRULES  20
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  24
+#define YYNSTATES  41
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   265
+#define YYMAXUTOK   271
 
 #define YYTRANSLATE(YYX)						\
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -381,8 +402,8 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-      16,    17,    13,    12,    18,    11,     2,    14,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,    15,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -403,7 +424,8 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
-       5,     6,     7,     8,     9,    10
+       5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
+      15,    16
 };
 
 #if YYDEBUG
@@ -411,24 +433,29 @@ static const yytype_uint8 yytranslate[] =
    YYRHS.  */
 static const yytype_uint8 yyprhs[] =
 {
-       0,     0,     3,     4,     9,    11,    14,    19,    25,    28,
-      30,    34
+       0,     0,     3,     4,     8,    12,    14,    17,    22,    28,
+      34,    36,    40,    42,    46,    48,    52,    54,    56,    60,
+      62
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      20,     0,    -1,    -1,    21,     5,    22,     6,    -1,    23,
-      -1,    22,    23,    -1,    25,    10,    25,    15,    -1,     7,
-      16,    24,    17,    15,    -1,     1,    15,    -1,     3,    -1,
-      24,    18,     3,    -1,     3,    -1
+      18,     0,    -1,    -1,    19,    20,     6,    -1,     4,    21,
+       5,    -1,    22,    -1,    21,    22,    -1,     3,    16,    25,
+      14,    -1,     7,    11,    23,    12,    14,    -1,     8,    11,
+      24,    12,    14,    -1,     3,    -1,    23,    13,     3,    -1,
+      25,    -1,    24,    13,    25,    -1,    26,    -1,    25,    27,
+      26,    -1,     3,    -1,    15,    -1,    11,    25,    12,    -1,
+       9,    -1,    10,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    29,    29,    29,    31,    32,    34,    35,    36,    38,
-      39,    41
+       0,    49,    49,    49,    51,    54,    55,    58,    59,    60,
+      63,    64,    67,    68,    71,    72,    75,    76,    77,    80,
+      81
 };
 #endif
 
@@ -437,10 +464,11 @@ static const yytype_uint8 yyrline[] =
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "$end", "error", "$undefined", "ID", "CONSTANTE", "INICIO", "FIN",
-  "LEER", "ESCRIBIR", "NEG", "ASIGNACION", "'-'", "'+'", "'*'", "'/'",
-  "';'", "'('", "')'", "','", "$accept", "programa", "@1",
-  "listaSentencias", "sentencia", "listaIdentificadores", "identificador", 0
+  "$end", "error", "$undefined", "ID", "INICIO", "FIN", "FDT", "LEER",
+  "ESCRIBIR", "SUMA", "RESTA", "PARENIZQUIERDO", "PARENDERECHO", "COMA",
+  "PUNTOYCOMA", "CONSTANTE", "ASIGNACION", "$accept", "objetivo", "@1",
+  "programa", "listaSentencias", "sentencia", "listaIdentificadores",
+  "listaExpresiones", "expresion", "primaria", "operadorAditivo", 0
 };
 #endif
 
@@ -450,22 +478,24 @@ static const char *const yytname[] =
 static const yytype_uint16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-     265,    45,    43,    42,    47,    59,    40,    41,    44
+     265,   266,   267,   268,   269,   270,   271
 };
 # endif
 
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    19,    21,    20,    22,    22,    23,    23,    23,    24,
-      24,    25
+       0,    17,    19,    18,    20,    21,    21,    22,    22,    22,
+      23,    23,    24,    24,    25,    25,    26,    26,    26,    27,
+      27
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     0,     4,     1,     2,     4,     5,     2,     1,
-       3,     1
+       0,     2,     0,     3,     3,     1,     2,     4,     5,     5,
+       1,     3,     1,     3,     1,     3,     1,     1,     3,     1,
+       1
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -473,31 +503,37 @@ static const yytype_uint8 yyr2[] =
    means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       2,     0,     0,     1,     0,     0,    11,     0,     0,     4,
-       0,     8,     0,     3,     5,     0,     9,     0,     0,     0,
-       0,     6,     7,    10
+       2,     0,     0,     1,     0,     0,     0,     0,     0,     0,
+       5,     3,     0,     0,     0,     4,     6,    16,     0,    17,
+       0,    14,    10,     0,     0,    12,     0,    19,    20,     7,
+       0,     0,     0,     0,     0,    18,    15,     8,    11,     9,
+      13
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     1,     2,     8,     9,    17,    10
+      -1,     1,     2,     5,     9,    10,    23,    24,    20,    21,
+      30
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -10
+#define YYPACT_NINF -15
 static const yytype_int8 yypact[] =
 {
-     -10,     4,     5,   -10,     0,    -4,   -10,    -3,    -1,   -10,
-       2,   -10,    11,   -10,   -10,    12,   -10,    -9,     1,     3,
-      14,   -10,   -10,   -10
+     -15,     2,     8,   -15,     3,    17,    14,     7,    20,     0,
+     -15,   -15,    -2,    26,    -2,   -15,   -15,   -15,    -2,   -15,
+       5,   -15,   -15,     4,    13,    18,    12,   -15,   -15,   -15,
+      -2,    19,    29,    21,    -2,   -15,   -15,   -15,   -15,   -15,
+      18
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -10,   -10,   -10,   -10,    13,   -10,     7
+     -15,   -15,   -15,   -15,   -15,    25,   -15,   -15,   -14,     6,
+     -15
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -507,25 +543,29 @@ static const yytype_int8 yypgoto[] =
 #define YYTABLE_NINF -1
 static const yytype_uint8 yytable[] =
 {
-       5,     5,     6,     6,     3,    13,     7,     7,    19,    20,
-       4,    11,    15,    12,    16,     6,    21,    23,    22,     0,
-       0,    14,    18
+      25,    17,     3,     6,    26,    15,     6,     7,     8,    18,
+       7,     8,     4,    19,    27,    28,    31,    32,    13,    29,
+      40,    27,    28,    11,    35,    33,    34,    27,    28,    22,
+      12,    14,    38,    37,    16,    39,    36
 };
 
-static const yytype_int8 yycheck[] =
+static const yytype_uint8 yycheck[] =
 {
-       1,     1,     3,     3,     0,     6,     7,     7,    17,    18,
-       5,    15,    10,    16,     3,     3,    15,     3,    15,    -1,
-      -1,     8,    15
+      14,     3,     0,     3,    18,     5,     3,     7,     8,    11,
+       7,     8,     4,    15,     9,    10,    12,    13,    11,    14,
+      34,     9,    10,     6,    12,    12,    13,     9,    10,     3,
+      16,    11,     3,    14,     9,    14,    30
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,    20,    21,     0,     5,     1,     3,     7,    22,    23,
-      25,    15,    16,     6,    23,    10,     3,    24,    25,    17,
-      18,    15,    15,     3
+       0,    18,    19,     0,     4,    20,     3,     7,     8,    21,
+      22,     6,    16,    11,    11,     5,    22,     3,    11,    15,
+      25,    26,     3,    23,    24,    25,    25,     9,    10,    14,
+      27,    12,    13,    12,    13,    12,    26,    14,     3,    14,
+      25
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1340,43 +1380,58 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 29 "parser.y"
-    { comenzar(); ;}
+#line 49 "parser.y"
+    { inicio(); ;}
     break;
 
   case 3:
-#line 29 "parser.y"
-    { terminar();;}
+#line 49 "parser.y"
+    { fin();;}
     break;
 
-  case 6:
-#line 34 "parser.y"
-    { asignar((yyvsp[(1) - (4)]), (yyvsp[(3) - (4)])); ;}
-    break;
-
-  case 8:
-#line 36 "parser.y"
-    { yyerrok; ;}
-    break;
-
-  case 9:
-#line 38 "parser.y"
-    { leer_id((yyvsp[(1) - (1)])); ;}
+  case 7:
+#line 58 "parser.y"
+    { printf("$1=%s,$3=%d\n",(yyvsp[(1) - (4)].string),(yyvsp[(3) - (4)].integer));asignar((yyvsp[(1) - (4)].string),(yyvsp[(3) - (4)].integer));;}
     break;
 
   case 10:
-#line 39 "parser.y"
-    { leer_id((yyvsp[(3) - (3)])); ;}
+#line 63 "parser.y"
+    {leer_id((yyvsp[(1) - (1)].string));;}
     break;
 
   case 11:
-#line 41 "parser.y"
-    { chequear((yyvsp[(1) - (1)])); (yyval) = (yyvsp[(1) - (1)]); ;}
+#line 64 "parser.y"
+    {leer_id((yyvsp[(3) - (3)].string));;}
+    break;
+
+  case 12:
+#line 67 "parser.y"
+    {escribir_exp((yyvsp[(1) - (1)].integer));;}
+    break;
+
+  case 13:
+#line 68 "parser.y"
+    {escribir_exp((yyvsp[(3) - (3)].integer));;}
+    break;
+
+  case 15:
+#line 72 "parser.y"
+    { printf("operador: %c\n",(yyvsp[(2) - (3)].character));(yyval.integer) = operacionAditiva((yyvsp[(1) - (3)].integer),(yyvsp[(2) - (3)].character),(yyvsp[(3) - (3)].integer));;}
+    break;
+
+  case 16:
+#line 75 "parser.y"
+    {(yyval.integer) = valor_id((yyvsp[(1) - (1)].string));}
+    break;
+
+  case 18:
+#line 77 "parser.y"
+    { (yyval.integer) = (yyvsp[(2) - (3)].integer);;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1380 "parser.c"
+#line 1435 "parser.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1590,112 +1645,111 @@ yyreturn:
 }
 
 
-#line 43 "parser.y"
+#line 84 "parser.y"
 
 
-struct definiciones {
-	char **vars;
-	int v_size;
-	int t_size;
-} defs;
+struct ids_dinamicos {
+	char **id_nombres;
+	int *ids;
+	int id_nombres_size;
+	int ids_size;
+} ids;
 
-char *declarar_temporal() {
-	char *t_str = malloc(12);
-	defs.t_size++;
-	printf("Declare Temp&%d,Integer,\n", defs.t_size);
-    
-	sprintf(t_str, "Temp&%d", defs.t_size);
-	return t_str;
-}
-
-const char *declarar_variable(const char *id) {
-	char **new_vars = realloc(defs.vars, (defs.v_size + 1) * sizeof id);
-
-	if(new_vars != NULL) {
-		new_vars[defs.v_size] = (char *) malloc(sizeof id);
-		sprintf(new_vars[defs.v_size], id, sizeof id);
-		defs.vars = new_vars;
-		defs.v_size++;
+const char *declarar_nombre(const char *id) {
+	char **id_nombres_nuevo = realloc(ids.id_nombres, (ids.id_nombres_size + 1) * sizeof id);
+	if(id_nombres_nuevo != NULL) {
+		id_nombres_nuevo[ids.id_nombres_size] = (char *) malloc(sizeof id);
+		sprintf(id_nombres_nuevo[ids.id_nombres_size], id, sizeof id);
+		ids.id_nombres = id_nombres_nuevo;
+		ids.id_nombres_size++;
 	}
-
-	printf("Declare %s,Integer,\n", id);
 
 	return id;
 }
 
-void escribir_exp(const char *val) {
-	printf("Write %s,Integer,\n", val);
-}
+const int declarar_valor(const int valor) {
+	int *ids_nuevo = realloc(ids.ids, (ids.ids_size + 1) * sizeof valor);
 
-void leer_id(const char *val) {
-	printf("Read %s,Integer,\n", val);
-}
-
-void asignar(const char *val1, const char *val2) {
-	printf("Storing...\n");
-	printf("Store %s,%s,\n", val2, val1);
-}
-
-char *gen_infijo(const char *val1, const char op, const char *val2) {
-	char *temp = declarar_temporal();
-	char *op_str = malloc(4);
-
-	switch(op) {
-	case '-':
-		strncpy(op_str, "SUBS", 4);
-	break;
-	case '*':
-		strncpy(op_str, "MULT", 4);
-	break;
-	case '/':
-		strncpy(op_str, "DIV", 4);
-	break;
-	case '+':
-		strncpy(op_str, "ADD", 4);
-	break;
+	if(ids_nuevo != NULL) {
+		ids_nuevo[ids.ids_size] = (int) malloc(sizeof valor);
+		ids_nuevo[ids.ids_size] = valor;
+		ids.ids = ids_nuevo;
+		ids.ids_size++;
 	}
 	
-	printf("%s %s,%s,%s\n", op_str, val1, val2, temp);
-	return temp;
+	return valor;
 }
 
-char *invertir(const char *val) {
-	char *temp = declarar_temporal();
-
-	printf("INV %s,,%s\n", val, temp);
-
-	return temp;
+const int declarar_valor_en_pos(const int valor, const int pos) {
+	ids.ids[pos] = valor;	
+	return valor;
 }
 
-char *chequear(const char *id) {
-	printf("ID %s",id);
+void escribir_exp(const int val) {
+	printf("Valor de la expresion: %d\n", val);
 }
 
-void terminar(void) {
-	puts("Stop ,,");
-}
-
-void comenzar(void) {
-	puts("Load rtlib,,");
-}
-
-int main(int argc, char *argv[]) {
-	int value = yyparse();
-
-	switch( value ){
-	case 0:
-		puts("Compilación terminada con éxito");
-		break;
-	case 1:
-		puts("Errores de compilación");
-		break;
-	case 2:
-		puts("Memoria insuficiente");
-		break;
+int operacionAditiva(const int val1, const char operadorAditivo, const int val2){
+	switch(operadorAditivo){
+		case '+':
+			return val1 + val2;
+		case '-':
+			return val1 - val2;
 	}
-
-	printf("Errores sintácticos: %d", yynerrs);
 	return 0;
+}
+
+void leer_id(const char *id) {
+	printf("Valor de %s=%d\n",id,valor_id(id));
+}
+
+int valor_id(const char *id){
+	if(ids.ids_size > 0){
+		for(int i = 0;i <ids.ids_size; i++){
+			printf("nombre == ID?: %s,%s\n", ids.id_nombres[i],id);
+
+			if (!strcmp(id,ids.id_nombres[i])){
+				printf("Son iguales. Valor a mostrar:%d\n",ids.ids[i]);
+				return ids.ids[i];
+			}
+		}
+	}
+	return 0;
+}
+
+int existe_en_pos(const char *id){
+	if(ids.ids_size > 0){
+		for(int i = 0;i <ids.ids_size; i++){
+			if (!strcmp(id,ids.id_nombres[i])){
+				return i;
+			}
+		}
+	}
+	return -1;
+}
+
+
+void asignar(const char *id, const int valor) {
+	int pos = existe_en_pos(id);
+	if(pos == -1){
+		declarar_nombre(id);
+		declarar_valor(valor);
+	} else {
+		declarar_valor_en_pos(valor,pos);
+	}
+}
+
+void inicio(void) {
+	printf("COMPILADOR CON FLEX Y BISON. Ingrese la secuencia de sentencias a evaluar:\n");
+	ids.ids_size = 0;
+}
+
+void fin(void) {
+	printf("Compilación terminada.\n");
+}
+
+int main(void) {
+	yyparse();
 }
 
 void yyerror(const char *s){

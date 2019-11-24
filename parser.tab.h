@@ -40,30 +40,51 @@
       know about them.  */
    enum yytokentype {
      ID = 258,
-     CONSTANTE = 259,
-     INICIO = 260,
-     FIN = 261,
+     INICIO = 259,
+     FIN = 260,
+     FDT = 261,
      LEER = 262,
      ESCRIBIR = 263,
-     NEG = 264,
-     ASIGNACION = 265
+     SUMA = 264,
+     RESTA = 265,
+     PARENIZQUIERDO = 266,
+     PARENDERECHO = 267,
+     COMA = 268,
+     PUNTOYCOMA = 269,
+     CONSTANTE = 270,
+     ASIGNACION = 271
    };
 #endif
 /* Tokens.  */
 #define ID 258
-#define CONSTANTE 259
-#define INICIO 260
-#define FIN 261
+#define INICIO 259
+#define FIN 260
+#define FDT 261
 #define LEER 262
 #define ESCRIBIR 263
-#define NEG 264
-#define ASIGNACION 265
+#define SUMA 264
+#define RESTA 265
+#define PARENIZQUIERDO 266
+#define PARENDERECHO 267
+#define COMA 268
+#define PUNTOYCOMA 269
+#define CONSTANTE 270
+#define ASIGNACION 271
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+typedef union YYSTYPE
+#line 20 "parser.y"
+{
+	char string[100];
+	char character;
+	int integer;
+}
+/* Line 1529 of yacc.c.  */
+#line 87 "parser.tab.h"
+	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1
