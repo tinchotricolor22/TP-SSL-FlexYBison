@@ -26,7 +26,7 @@ int ends_with(const char *str, const char *suffix);
 	int integer;
 }
 
-%define "parser.tab.h"
+%defines "parser.tab.h"
 %output = "parser.tab.c"
 %token <string> ID INICIO FIN FDT LEER ESCRIBIR PARENIZQUIERDO PARENDERECHO COMA PUNTOYCOMA
 %token <character> SUMA
@@ -67,7 +67,7 @@ expresion	: primaria
 			| expresion operadorAditivo primaria { $$ = operacionAditiva($1,$2,$3);}
 			;
 
-primaria 	: ID {$$ = valor_id($1)}
+primaria 	: ID {$$ = valor_id($1);}
 			| CONSTANTE
 			| PARENIZQUIERDO expresion PARENDERECHO { $$ = $2;}
 			;
